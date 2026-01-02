@@ -14,20 +14,39 @@ public static class S3Setup
 
         var accessKey = configuration["AWS.S3.ACCESSKEY"];
         var secretKey = configuration["AWS.S3.SECRETKEY"];
+        var serviceUrl = configuration["AWS.S3.SERVICEURL"]; // Para LocalStack
+        var forcePathStyle = configuration.GetValue("AWS.S3.FORCEPATHHSTYLE", false);
 
-        // Configura o cliente S3 da AWS
-        var awsOptions = new AWSOptions
+
+        // Se ServiceURL estiver configurado, usar LocalStack
+        if (!string.IsNullOrEmpty(serviceUrl))
         {
-            Region = Amazon.RegionEndpoint.GetBySystemName(region),
-            Credentials = new Amazon.Runtime.BasicAWSCredentials(accessKey, secretKey)
-        };
+            Console.WriteLine($"✅ AWS S3 configurado com LocalStack: {serviceUrl}");
 
-        Console.WriteLine("✅ AWS S3 configurado com credenciais específicas");
+            services.AddSingleton<IAmazonS3>(sp =>
+            {
+                var config = new Amazon.S3.AmazonS3Config
+                {
+                    ServiceURL = serviceUrl,
+                    ForcePathStyle = forcePathStyle,
+                    AuthenticationRegion = region
+                };
 
-        services.AddDefaultAWSOptions(awsOptions);
-        services.AddAWSService<IAmazonS3>();
+                return new AmazonS3Client(accessKey, secretKey, config);
+            });
+        }
+        else
+        {
+            Console.WriteLine("✅ AWS S3 configurado com credenciais AWS reais");
+            var awsOptions = new AWSOptions
+            {
+                Region = Amazon.RegionEndpoint.GetBySystemName(region),
+                Credentials = new Amazon.Runtime.BasicAWSCredentials(accessKey, secretKey)
+            };
+            services.AddDefaultAWSOptions(awsOptions);
+            services.AddAWSService<IAmazonS3>();
+        }
 
-        // Registra o serviço S3
         services.AddScoped<IS3Service, S3Service>();
 
         return services;

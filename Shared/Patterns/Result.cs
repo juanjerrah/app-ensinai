@@ -11,12 +11,6 @@ public class Result<T>
 
     private Result(bool isSuccess, T? value, Error error)
     {
-        if (isSuccess && error != Error.None)
-            throw new InvalidOperationException("Erro inválido para um resultado de sucesso");
-
-        if (!isSuccess && error == Error.None)
-            throw new InvalidOperationException("Erro obrigatório para um resultado de falha");
-
         IsSuccess = isSuccess;
         Value = value;
         Error = error;
@@ -54,10 +48,10 @@ public class Result
 
     private Result(bool isSuccess, Error error)
     {
-        if (isSuccess && error != Error.None)
+        if (isSuccess && !Equals(error, Error.None))
             throw new InvalidOperationException("Erro inválido para um resultado de sucesso");
 
-        if (!isSuccess && error == Error.None)
+        if (!isSuccess && Equals(error, Error.None))
             throw new InvalidOperationException("Erro obrigatório para um resultado de falha");
 
         IsSuccess = isSuccess;

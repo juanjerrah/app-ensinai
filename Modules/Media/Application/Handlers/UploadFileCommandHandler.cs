@@ -28,6 +28,7 @@ public class UploadFileCommandHandler(
             fileUploadDto.File.FileName,
             fileUploadDto.File.ContentType,
             fileUploadDto.File.Length,
+            fileUploadDto.FileType,
             fileUploadDto.IsPrivate
         );
 

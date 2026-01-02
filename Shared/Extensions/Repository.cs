@@ -5,7 +5,7 @@ namespace app_ensinai.Shared.Extensions;
 
 public abstract class Repository<T>(IDbConnection connection) : IRepository<T> where T : class
 {
-    private readonly IDbConnection _connection = connection;
+    protected readonly IDbConnection _connection = connection;
     protected abstract string TableName { get; }
 
     public virtual async Task<IEnumerable<T>> GetAllAsync()

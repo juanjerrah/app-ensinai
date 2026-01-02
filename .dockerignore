@@ -1,0 +1,86 @@
+# ==============================================================================
+# .dockerignore - Arquivos e diretórios a serem ignorados no build Docker
+# ==============================================================================
+
+# Diretórios de build e binários
+bin/
+obj/
+out/
+
+# Arquivos de publicação
+publish/
+dist/
+
+# Visual Studio / VS Code
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Arquivos de cache e temporários
+*.cache
+*.tmp
+*.temp
+*.log
+
+# Dependências e pacotes
+packages/
+node_modules/
+
+# Arquivos de configuração local
+appsettings.Development.json
+appsettings.Local.json
+*.Development.json
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Docker
+Dockerfile*
+.dockerignore
+docker-compose*.yml
+
+# Documentação
+README.md
+*.md
+docs/
+
+# Arquivos de teste
+**/*Tests/
+**/*.Test/
+**/TestResults/
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE Rider
+.idea/
+*.DotSettings.user
+
+# Arquivos de banco de dados local
+*.db
+*.sqlite
+*.sqlite3
+
+# Arquivos de log
+logs/
+*.log
+
+# Certificados e chaves (nunca incluir em imagens!)
+*.pfx
+*.p12
+*.key
+*.pem
+certificates/
+
+# Arquivos de backup
+*.bak
+*.backup

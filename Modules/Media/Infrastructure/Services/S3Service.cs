@@ -25,7 +25,7 @@ public class S3Service : IS3Service
     /// <param name="fileName">Nome do arquivo no S3</param>
     /// <param name="contentType">Tipo de conteúdo (ex: image/jpeg, application/pdf)</param>
     /// <returns>URL do arquivo no S3</returns>
-    public async Task<string> UploadFileAsync(Stream fileStream, string fileName, string? contentType = null, bool isPrivate = false)
+    public async Task<(string fileUrl, string bucketName)> UploadFileAsync(Stream fileStream, string fileName, string? contentType = null, bool isPrivate = false)
     {
         try
         {
@@ -40,7 +40,7 @@ public class S3Service : IS3Service
 
             await _s3Client.PutObjectAsync(uploadRequest);
 
-            return GetFileUrl(fileName, isPrivate);
+            return (GetFileUrl(fileName, isPrivate), _bucketName);
         }
         catch (AmazonS3Exception ex)
         {

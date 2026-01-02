@@ -1,60 +1,72 @@
-using System.Data;
 using app_ensinai.Modules.Media.Domain.Interfaces.Repositories;
 using app_ensinai.Shared.Extensions;
 using Dapper;
+using Npgsql;
 using FileEntity = app_ensinai.Modules.Media.Domain.Models.File;
 
 namespace app_ensinai.Modules.Media.Infrastructure.Repositories;
 
 public class FileRepository : Repository<FileEntity>, IFileRepository
 {
-    protected override string TableName => "files";
-    private readonly IDbConnection _connection;
-
-    public FileRepository(IDbConnection connection) : base(connection)
+    protected override string TableName => "media.files";
+    
+    public FileRepository(NpgsqlConnection connection) : base(connection)
     {
-        _connection = connection;
     }
 
-
-    public override Task<int> AddAsync(FileEntity entity)
+    public override async Task<int> AddAsync(FileEntity entity)
     {
-        var sql = $"INSERT INTO {TableName} (Name, Content, UserId) VALUES (@Name, @Content, @UserId)";
-        var parameters = new
-        {
-            Name = entity.FileName,
-            Content = entity.ContentType,
-        };
-
-        return _connection.ExecuteAsync(sql, parameters);
-    }
-
-    public override Task<int> UpdateAsync(FileEntity entity)
-    {
-        var sql = $"UPDATE {TableName} SET Name = @Name, Content = @Content WHERE Id = @Id";
+        var sql = $@"INSERT INTO {TableName} 
+            (id, file_name, file_size, content_type, bucket, file_type, created_at, updated_at) 
+            VALUES (@Id, @FileName, @FileSize, @ContentType, @Bucket, @FileType, @CreatedAt, @UpdatedAt)";
+        
         var parameters = new
         {
             Id = entity.Id,
-            Name = entity.FileName,
-            Content = entity.ContentType
+            FileName = entity.FileName,
+            FileSize = entity.FileSize,
+            ContentType = entity.ContentType,
+            Bucket = entity.Bucket,
+            FileType = (int)entity.FileType,
+            CreatedAt = entity.CreatedAt,
+            UpdatedAt = entity.UpdatedAt
         };
 
-        return _connection.ExecuteAsync(sql, parameters);
+        return await _connection.ExecuteAsync(sql, parameters);
     }
 
-    public Task<IEnumerable<FileEntity>> GetFilesByUserIdAsync(Guid userId)
+    public override async Task<int> UpdateAsync(FileEntity entity)
     {
-        var query = $"SELECT * FROM {TableName} WHERE UserId = @UserId";
-        var parameters = new DynamicParameters();
-        parameters.Add("UserId", userId);
-        return _connection.QueryAsync<FileEntity>(query, parameters);
+        var sql = $@"UPDATE {TableName} 
+            SET file_name = @FileName, 
+                file_size = @FileSize, 
+                content_type = @ContentType, 
+                bucket = @Bucket, 
+                file_type = @FileType, 
+                updated_at = @UpdatedAt 
+            WHERE id = @Id";
+        
+        var parameters = new
+        {
+            Id = entity.Id,
+            FileName = entity.FileName,
+            FileSize = entity.FileSize,
+            ContentType = entity.ContentType,
+            Bucket = entity.Bucket,
+            FileType = (int)entity.FileType,
+            UpdatedAt = entity.UpdatedAt
+        };
+
+        return await _connection.ExecuteAsync(sql, parameters);
     }
 
-    public Task<FileEntity?> GetFileByIdAsync(Guid id)
+    public async Task<FileEntity?> GetFileByIdAsync(Guid id)
     {
-        var query = $"SELECT * FROM {TableName} WHERE Id = @Id";
+        var query = $@"SELECT id, file_name, file_size, content_type, bucket, file_type, created_at, updated_at 
+                      FROM {TableName} 
+                      WHERE id = @Id";
         var parameters = new DynamicParameters();
         parameters.Add("Id", id);
-        return _connection.QuerySingleOrDefaultAsync<FileEntity>(query, parameters);
+        return await _connection.QuerySingleOrDefaultAsync<FileEntity>(query, parameters);
     }
 }

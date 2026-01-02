@@ -4,3 +4,7 @@ Properties/
 
 appsettings.*.json
 appsettings.json
+
+/.vscode/
+/Properties/
+/.idea/

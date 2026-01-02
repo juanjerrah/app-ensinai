@@ -1,3 +1,4 @@
+using app_ensinai.Modules.Media.Domain.Enums;
 using app_ensinai.Modules.Media.Domain.Interfaces.Repositories;
 using app_ensinai.Modules.Media.Domain.Interfaces.Services;
 using app_ensinai.Shared.Patterns;
@@ -21,6 +22,7 @@ public class UploadFileUseCase : IUploadFileUseCase
         string fileName, 
         string contentType, 
         long fileSize, 
+        EFileType fileType,
         bool isPrivate = false)
     {
         // Regra de negócio: Sanitizar nome do arquivo
@@ -32,10 +34,10 @@ public class UploadFileUseCase : IUploadFileUseCase
         try
         {
             // Upload para S3
-            var fileUrl = await _s3Service.UploadFileAsync(fileStream, uniqueFileName, contentType, isPrivate);
+            var (fileUrl, bucketName) = await _s3Service.UploadFileAsync(fileStream, uniqueFileName, contentType, isPrivate);
 
             // Criar entidade de arquivo
-            var fileEntity = new FileEntity(uniqueFileName, fileSize, contentType, "");
+            var fileEntity = new FileEntity(uniqueFileName, fileSize, contentType, fileType, bucketName);
 
             // Persistir no banco de dados
             await _fileRepository.AddAsync(fileEntity);

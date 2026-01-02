@@ -1,0 +1,104 @@
+# ==============================================================================
+# Docker Compose - EnsinAI Application
+# Para desenvolvimento e testes locais
+# ==============================================================================
+
+services:
+  # Aplicação .NET
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ensinai-app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=app-ensinai;Username=postgres;Password=1234
+      # AWS S3 Configuration (LocalStack)
+      - AWS__REGION=us-east-1
+      - AWS__S3__ACCESSKEY=test
+      - AWS__S3__SECRETKEY=test
+      - AWS__S3__BUCKETNAME=ensinai-files
+      - AWS__S3__SERVICEURL=http://localstack:4566
+      - AWS__S3__FORCEPATHHSTYLE=true
+    depends_on:
+      postgres:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
+    networks:
+      - ensinai-network
+    volumes:
+      # Volume para uploads/arquivos temporários
+      - app-data:/app/temp
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 40s
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: ensinai-postgres
+    restart: unless-stopped
+    ports:
+      - "5433:5432"  # Porta externa 5433 para evitar conflito com PostgreSQL local
+    environment:
+      - POSTGRES_DB=app-ensinai
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=1234
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - ensinai-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ensinai_user -d ensinai"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # LocalStack - Emulador de serviços AWS (S3)
+  localstack:
+    image: localstack/localstack:latest
+    container_name: ensinai-localstack
+    restart: unless-stopped
+    ports:
+      - "4566:4566"            # LocalStack Gateway
+      - "4510-4559:4510-4559"  # Serviços externos
+    environment:
+      - SERVICES=s3
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - AWS_DEFAULT_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+    volumes:
+      - localstack-data:/tmp/localstack
+      - ./scripts/localstack-init.sh:/etc/localstack/init/ready.d/init-aws.sh
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - ensinai-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  postgres-data:
+    driver: local
+  app-data:
+    driver: local
+  localstack-data:
+    driver: local
+
+networks:
+  ensinai-network:
+    driver: bridge

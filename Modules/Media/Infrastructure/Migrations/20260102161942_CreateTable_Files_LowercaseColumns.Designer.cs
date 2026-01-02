@@ -12,8 +12,8 @@ using app_ensinai.Modules.Media.Infrastructure.Data;
 namespace app_ensinai.Modules.Media.Infrastructure.Migrations
 {
     [DbContext(typeof(MediaDbContext))]
-    [Migration("20260102004518_CreateTable_Files")]
-    partial class CreateTable_Files
+    [Migration("20260102161942_CreateTable_Files_LowercaseColumns")]
+    partial class CreateTable_Files_LowercaseColumns
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -29,34 +29,42 @@ namespace app_ensinai.Modules.Media.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<string>("Bucket")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("bucket");
 
                     b.Property<string>("ContentType")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("content_type");
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
 
                     b.Property<string>("FileName")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("file_name");
 
                     b.Property<long>("FileSize")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("file_size");
 
                     b.Property<int>("FileType")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("file_type");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
 
                     b.HasKey("Id");
 

@@ -4,6 +4,8 @@ using app_ensinai.Modules.Media.Infrastructure.Repositories;
 using app_ensinai.Modules.Media.Domain.UseCases;
 using app_ensinai.Modules.Media.Application.Handlers;
 using app_ensinai.Modules.Media.Application.Validators;
+using app_ensinai.Modules.Media.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace app_ensinai.Modules.Media.Infrastructure;
 
@@ -11,6 +13,11 @@ public static class Setup
 {
     public static void AddFileModule(this IServiceCollection services, IConfiguration configuration)
     {
+        // Registrar DbContext do Entity Framework Core
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        services.AddDbContext<MediaDbContext>(options =>
+            options.UseNpgsql(connectionString));
+
         services.AddS3Extensions(configuration);
         services.AddHandlers();
         services.AddUseCases();

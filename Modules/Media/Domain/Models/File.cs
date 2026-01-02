@@ -3,11 +3,21 @@ using app_ensinai.Shared.Models;
 
 namespace app_ensinai.Modules.Media.Domain.Models;
 
-public class File(string fileName, long fileSize, string contentType, string bucket) : Entity
+public class File : Entity
 {
-    public string FileName { get; set; } = fileName;
-    public long FileSize { get; set; } = fileSize;
-    public string ContentType { get; set; } = contentType;
-    public string Bucket { get; set; } = bucket;
+    public File(string fileName, long fileSize, string contentType, EFileType fileType, string bucket)
+    {
+        FileName = fileName;
+        FileSize = fileSize;
+        ContentType = contentType;
+        Bucket = bucket;
+        FileType = fileType;
+    }
+
+    public string FileName { get; set; }
+    public long FileSize { get; set; }
+    public string ContentType { get; set; }
+    public string Bucket { get; set; }
     public EFileType FileType { get; set; }
 }
+
