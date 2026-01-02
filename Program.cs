@@ -1,0 +1,67 @@
+using app_ensinai.Modules.Media.Infrastructure;
+using app_ensinai.Shared.CrossCutting;
+using app_ensinai.Shared.Middlewares;
+using Microsoft.OpenApi;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+
+builder.Services.AddControllers();
+
+// Swagger/OpenAPI Configuration
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "EnsinAI API",
+        Version = "v1",
+        Description = "API para aplicação de agendamento de aulas particulares",
+        Contact = new OpenApiContact
+        {
+            Name = "EnsinAI Team",
+            Email = "contato@ensinai.com"
+        }
+    });
+
+    // Habilitar anotações XML (comentários)
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
+    {
+        options.IncludeXmlComments(xmlPath);
+    }
+});
+
+// Add PostgreSQL Configuration
+builder.Services.AddPostgresConfiguration(builder.Configuration);
+
+// Modules
+builder.Services.AddFileModule(builder.Configuration);
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "EnsinAI API v1");
+        options.RoutePrefix = "swagger"; // Acessível em: /swagger
+        options.DocumentTitle = "EnsinAI API Documentation";
+        options.DisplayRequestDuration();
+    });
+}
+
+// Middleware de logging (deve ser um dos primeiros)
+app.UseRequestLogging();
+
+app.UseHttpsRedirection();
+
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.Run();
