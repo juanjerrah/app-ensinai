@@ -18,6 +18,8 @@ namespace app_ensinai.Modules.Auth.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new TeacherConfiguration());
             modelBuilder.ApplyConfiguration(new StudentConfiguration());
             modelBuilder.ApplyConfiguration(new UserFilesConfiguration());
+            modelBuilder.ApplyConfiguration(new InterestAreaConfiguration());
+            modelBuilder.ApplyConfiguration(new UserInterestAreaConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }

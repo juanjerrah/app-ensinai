@@ -41,10 +41,8 @@ namespace app_ensinai.Modules.Auth.Infrastructure.Data.Configurations
             .HasForeignKey(x => x.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasOne(x => x.File)
-                .WithMany()
-                .HasForeignKey(x => x.FileId)
-                .OnDelete(DeleteBehavior.Restrict);
+            // ✅ FileId é apenas uma coluna - sem FK para outro módulo
+            // A relação com o módulo Media é apenas lógica, não de banco
 
             // Indexes
             builder.HasIndex(x => x.UserId)

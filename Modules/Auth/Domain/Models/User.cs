@@ -24,6 +24,7 @@ public class User(string name,
     public DateTime ExpiryTime { get; set; } = expiryTime;
     public bool Active { get; set; } = true;
 
-    public ICollection<UserFiles> UserFiles { get; set; }
+    public ICollection<UserFiles> UserFiles { get; set; } = new List<UserFiles>();
+    public ICollection<UserInterestArea> UserInterestAreas { get; set; } = new List<UserInterestArea>();
 
 }
