@@ -1,23 +1,13 @@
 using app_ensinai.Modules.Media.Infrastructure;
 using app_ensinai.Shared.CrossCutting;
-using app_ensinai.Shared.Infrastructure.Dapper;
 using app_ensinai.Shared.Middlewares;
 using Microsoft.OpenApi;
-using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configurar Dapper
-DapperConfiguration.Configure();
-
 // Add services to the container.
 
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        // Configurar enums para serem serializados como strings
-        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-    });
+builder.Services.AddControllers();
 
 // Swagger/OpenAPI Configuration
 builder.Services.AddEndpointsApiExplorer();
